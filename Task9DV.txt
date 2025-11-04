@@ -1,0 +1,51 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.linear_model import LinearRegression
+
+# Load and preprocess data
+data = pd.read_csv('WorldPopulation2023.csv')
+data.columns = data.columns.str.strip()
+data = data.sort_values('Population2023', ascending=False).head(20)
+data = data.sort_values('Rank')
+
+# LINE GRAPH - Population by Country Rank (top 20)
+plt.figure(figsize=(12, 7))
+sns.lineplot(x='Rank', y='Population2023', data=data)
+plt.title('Top 20 Countries: Line Graph of Population by Country Rank')
+plt.xlabel('Country Rank')
+plt.ylabel('Population (2023)')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# TREND LINE - Population Trend Across Ranks (top 20)
+x = data['Rank'].values.reshape(-1, 1)
+y = data['Population2023'].values
+
+model = LinearRegression()
+model.fit(x, y)
+slope = model.coef_[0]
+intercept = model.intercept_
+
+plt.figure(figsize=(12, 7))
+plt.scatter(data['Rank'], data['Population2023'], color='blue', label='Population Data')
+plt.plot(data['Rank'], slope * x + intercept, color='red', linewidth=2, label='Trend Line')
+plt.title('Top 20 Countries: Population Trend with Trend Line')
+plt.xlabel('Country Rank')
+plt.ylabel('Population (2023)')
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+# AREA CHART - Highlighting Top Populations (top 20)
+plt.figure(figsize=(12, 7))
+plt.fill_between(data['Rank'], data['Population2023'], color='skyblue', alpha=0.7)
+plt.title('Top 20 Countries: Area Chart of Population by Country Rank')
+plt.xlabel('Country Rank')
+plt.ylabel('Population (2023)')
+plt.grid(True)
+plt.tight_layout()
+plt.show()

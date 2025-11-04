@@ -1,0 +1,72 @@
+import pandas as pd
+import re
+import networkx as nx
+import matplotlib.pyplot as plt
+from collections import Counter
+from nltk.corpus import stopwords
+from wordcloud import WordCloud
+from networkx.algorithms import community
+
+# Load population dataset
+df = pd.read_csv("WorldPopulation2023.csv")
+df['Population2023'] = df['Population2023'].replace({',': ''}, regex=True).astype(int)
+
+# Create a text corpus with country names repeated proportional to population in million buckets
+corpus = []
+for _, row in df.iterrows():
+    country = row['Country']
+    pop_million = row['Population2023'] // 1_000_000  # Millions as repeat count (integer)
+    corpus.extend([country.lower()] * pop_million)
+
+text_corpus = ' '.join(corpus)
+
+# Preprocessing (minimal here as dataset contains country names only)
+stop = set(stopwords.words('english'))
+tokens = [word for word in text_corpus.split() if word not in stop]
+
+# Word Cloud
+wc = WordCloud(width=800, height=400, background_color='white', collocations=False).generate(' '.join(tokens))
+wc.to_file('world_population_wordcloud.png')
+plt.imshow(wc, interpolation='bilinear')
+plt.axis('off')
+plt.title('World Population 2023 - Word Cloud by Country Population')
+plt.show()
+
+# Build co-occurrence network with window=2: countries appearing together in sequence
+def build_cooccurrence(tokens, window=2):
+    G = nx.Graph()
+    for i in range(len(tokens)):
+        for j in range(i+1, min(i+window+1, len(tokens))):
+            u, v = tokens[i], tokens[j]
+            if u == v: continue
+            if G.has_edge(u, v):
+                G[u][v]['weight'] += 1
+            else:
+                G.add_edge(u, v, weight=1)
+    return G
+
+G = build_cooccurrence(tokens)
+
+# Centrality and community detection
+degree_centrality = nx.degree_centrality(G)
+communities = community.greedy_modularity_communities(G, weight='weight')
+
+# Network Visualization
+plt.figure(figsize=(12,8))
+pos = nx.spring_layout(G, seed=42)
+node_sizes = [5000 * degree_centrality.get(node, 0) for node in G.nodes()]
+nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color='skyblue')
+nx.draw_networkx_labels(G, pos, font_size=10)
+nx.draw_networkx_edges(G, pos, alpha=0.3)
+plt.title("Population-based Country Co-occurrence Network (2023)")
+plt.axis('off')
+plt.show()
+
+# Print key countries and communities
+print("Top countries by network degree centrality:")
+for node, centrality in sorted(degree_centrality.items(), key=lambda x: x[1], reverse=True)[:10]:
+    print(f"{node}: {centrality:.3f}")
+
+print("\nDetected communities:")
+for i, com in enumerate(communities):
+    print(f"Community {i+1}: {', '.join(sorted(com))}")

@@ -1,0 +1,36 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Load data
+df = pd.read_csv('WorldPopulation2023.csv')
+
+# Convert population to integer
+df['Population2023'] = df['Population2023'].replace({',': ''}, regex=True).astype(int)
+
+# Use top 20 countries
+top_countries = df.sort_values('Population2023', ascending=False).head(20).reset_index(drop=True)
+country_names = top_countries['Country'].tolist()
+populations = top_countries['Population2023'].tolist()
+
+# Create graph
+G = nx.Graph()
+G.add_nodes_from(country_names)
+
+# Connect with population difference < 15%
+threshold = 0.15
+for i in range(len(country_names)):
+    for j in range(i + 1, len(country_names)):
+        pop1, pop2 = populations[i], populations[j]
+        if abs(pop1 - pop2) / max(pop1, pop2) < threshold:
+            G.add_edge(country_names[i], country_names[j])
+
+# Remove unconnected nodes
+G.remove_nodes_from(list(nx.isolates(G)))
+
+# Draw network with increased node distance (k controls spacing)
+plt.figure(figsize=(14, 10))
+pos = nx.spring_layout(G, seed=42, k=0.6)  # Larger k for more spacing
+nx.draw(G, pos, with_labels=True, node_size=600, node_color='skyblue', font_size=12)
+plt.title('Top 20 Countries Network with 15% Population Difference\nUnconnected Nodes Removed, Increased Spacing')
+plt.show()

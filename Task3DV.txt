@@ -1,0 +1,122 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+# Load dataset
+df = pd.read_csv("WorldPopulation2023.csv")
+
+# Take only first 10 rows
+df = df.head(30).copy()
+
+# Clean 'UrbanPop%' column: remove %, replace 'N.A.' with 0 and convert to float
+df['UrbanPop%'] = df['UrbanPop%'].replace('N.A.', '0').str.rstrip('%').astype(float)
+
+# Clean 'YearlyChange' column: remove %, convert to float
+df['YearlyChange'] = df['YearlyChange'].str.rstrip(' %').astype(float)
+
+# Create categorical binned column for urbanization level
+df['Urbanization_Level'] = pd.cut(
+    df['UrbanPop%'],
+    bins=[-1, 40, 70, 100],
+    labels=['Low', 'Medium', 'High']
+)
+
+# Create binned categorical variable for yearly change
+df['YearlyChange_Level'] = pd.cut(
+    df['YearlyChange'],
+    bins=[-np.inf, 0, 1, np.inf],
+    labels=['Negative/Zero', 'Low Growth', 'High Growth']
+)
+
+cat1 = 'Urbanization_Level'
+cat2 = 'YearlyChange_Level'
+cont1 = 'Density(P/Km²)'
+cont2 = 'NetChange'
+
+# Convert 'NetChange' to numeric (remove commas if any, then to int)
+df['NetChange'] = df['NetChange'].astype(str).str.replace(',', '').astype(int)
+
+# Prepare crosstab data
+ct = pd.crosstab(df[cat1], df[cat2])
+
+# 1. Stacked Bar Chart (Normalized proportions)
+(ct.T / ct.T.sum()).T.plot(kind='bar', stacked=True, figsize=(10, 6))
+plt.title(f"Stacked Bar Chart (Normalized): {cat1} vs {cat2} (Top 10 rows)")
+plt.ylabel("Proportion")
+plt.xticks(rotation=45)
+plt.legend(title=cat2)
+plt.show()
+
+# 2. Grouped Bar Chart with Log Scale on Y-axis
+ct.plot(kind='bar', stacked=False, figsize=(10, 6), log=True)
+plt.title(f"Grouped Bar Chart with Log Scale: {cat1} vs {cat2} (Top 10 rows)")
+plt.ylabel("Count (log scale)")
+plt.xticks(rotation=45)
+plt.legend(title=cat2)
+plt.show()
+
+# 3. Segmented Bar Chart (percentage)
+(pd.crosstab(df[cat1], df[cat2], normalize='index') * 100).plot(kind='bar', stacked=True, figsize=(10, 6))
+plt.title(f"Segmented Bar Chart (%): {cat1} vs {cat2} (Top 10 rows)")
+plt.ylabel("Percentage")
+plt.xticks(rotation=45)
+plt.show()
+
+# 4. Mosaic Plot
+try:
+    from statsmodels.graphics.mosaicplot import mosaic
+    mosaic(df[[cat1, cat2]].dropna(), [cat1, cat2])
+    plt.title(f"Mosaic Plot: {cat1} vs {cat2} (Top 10 rows)")
+    plt.xticks(rotation=45)
+    plt.show()
+except Exception as e:
+    print("Mosaic plot failed:", e)
+
+# 5. Scatterplot with fit line (Continuous vs Continuous)
+sns.lmplot(data=df, x=cont1, y=cont2, line_kws={'color':'red'}, height=5, aspect=1.3)
+plt.title(f"Scatterplot with Fit Line: {cont1} vs {cont2} (Top 10 rows)")
+plt.show()
+
+# 6. Categorical vs Continuous Plots
+
+# 6.1 Bar Chart (Summary Statistics)
+df.groupby(cat1)[cont2].mean().plot(kind='bar', color='lightgreen', figsize=(10, 6))
+plt.title(f"Average {cont2} by {cat1} (Top 10 rows)")
+plt.ylabel(f"Average {cont2}")
+plt.xticks(rotation=45)
+plt.show()
+
+# 6.2 Grouped Kernel Density Plot
+sns.kdeplot(data=df, x=cont2, hue=cat1, fill=True)
+plt.title(f"Grouped Kernel Density: {cont2} by {cat1} (Top 10 rows)")
+plt.show()
+
+# 6.3 Box Plot
+sns.boxplot(data=df, x=cat1, y=cont2)
+plt.title(f"Box Plot: {cat1} vs {cont2} (Top 10 rows)")
+plt.xticks(rotation=45)
+plt.show()
+
+# 6.4 Violin Plot
+sns.violinplot(data=df, x=cat1, y=cont2, inner='quartile')
+plt.title(f"Violin Plot: {cat1} vs {cont2} (Top 10 rows)")
+plt.xticks(rotation=45)
+plt.show()
+
+# 6.5 Ridgeline Plot (requires joypy)
+try:
+    from joypy import joyplot
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(10, 6))
+    joyplot(df, by=cat1, column=cont2)
+    plt.title(f"Ridgeline Plot: {cont2} by {cat1} (Top 10 rows)")
+    plt.show()
+except Exception as e:
+    print("Ridgeline plot failed (try installing joypy):", e)
+
+# 6.6 Beeswarm Plot
+sns.swarmplot(data=df, x=cat1, y=cont2)
+plt.title(f"Beeswarm Plot: {cat1} vs {cont2} (Top 10 rows)")
+plt.xticks(rotation=45)
+plt.show()

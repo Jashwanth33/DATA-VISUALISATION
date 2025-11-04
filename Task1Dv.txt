@@ -1,0 +1,251 @@
+EX.NO-1
+Consider any one of the dataset from kaggle
+•	Read the dataset and display 5 lines of your dataframe.
+•	Identify the display the count of null values(missing values) in each columns
+•	Clean up the blank(null) column and display it
+•	Identify and remove the duplicate entries from data set
+
+Fetching Datasets from Kaggle
+
+1.	Student Performance Dataset
+•	Contains data about students' grades, gender, study time, etc. Good for bar charts and correlation heatmaps.
+2.	Netflix Movies and TV Shows
+•	Dataset with titles, genres, countries, and release years. Great for pie charts, timelines, and trend plots.
+3.	COVID-19 Dataset
+•	Country-wise case and death statistics. Useful for line graphs, heatmaps, and geo-maps.
+4.	Mobile Price Classification
+•	Includes mobile phone specs and price range categories. Good for feature-based visualizations.
+5.	World Population by Country (2023)
+•	Good for choropleth maps, bar charts, and comparison visuals.
+6.	YouTube Trending Videos
+•	Contains daily trending video data for countries like US, IN, etc.
+7.	Spotify Top Tracks
+•	Audio features of popular songs – suitable for radar charts, scatter plots.
+8.	Indian Census Dataset
+•	Demographic and population data for Indian states.
+
+
+Steps to Download the Dataset from Kaggle
+Step 1: Create a Kaggle Account (if not done already)
+1.	Go to https://www.kaggle.com
+2.	Click Sign Up (top right corner)
+3.	Sign up using Google, Facebook, or email
+4.	Complete your profile (optional, but helpful)
+
+Step 2: Search for the Dataset
+1.	After logging in, go to the Kaggle homepage
+2.	Use the search bar at the top and type:
+ 				Example (Student Performance Dataset)	
+3:Select the dataset titled:
+•	Students Performance in Exams by "spscientist"
+•	Or similar titles like Student Performance Data Set
+   Step 4: Download the Dataset
+1.	On the dataset page, click the “Download” button on the top right.
+2.	The dataset will be downloaded as a ZIP file (e.g., students-performance-in-exams.zip)
+Step 5: Extract and Use the File
+1.	Extract the ZIP file using WinRAR, 7-Zip, or the built-in Windows extractor
+2.	Inside, you’ll find a file like:
+o	StudentsPerformance.csv
+Step 6: Open and Explore
+•	You can now open the dataset in:
+o	Excel
+o	Google Sheets
+o	Python (using Pandas)
+o	Tableau, Power BI, or any visualization tool
+Preprocessing (Identify and remove the duplicate entries from data set
+
+import pandas as pd
+
+# Step 1: Read the dataset and display 5 lines of your dataframe
+df = pd.read_csv('student-scores.csv')  # Replace with your actual file name
+print("First 5 rows of the dataset:")
+print(df.head())
+
+# Step 2: Identify and display the count of null values in each column
+print("\nCount of missing values (nulls) in each column:")
+print(df.isnull().sum())
+
+# Step 3: Clean up the blank (null) columns
+df_cleaned = df.dropna(axis=1, how='all')  # Drop columns where all values are null
+print("\nData after removing completely blank (null) columns:")
+print(df_cleaned.head())
+
+# Step 4: Identify and remove the duplicate entries from dataset
+before = df_cleaned.shape[0]
+df_cleaned = df_cleaned.drop_duplicates()
+after = df_cleaned.shape[0]
+print(f"\nRemoved {before - after} duplicate rows. Final dataset shape: {df_cleaned.shape}")
+
+# Step 5: Save final cleaned dataset
+df_cleaned.to_csv('final_cleaned_dataset.csv', index=False)
+print("\nFinal cleaned dataset has been saved as 'final_cleaned_dataset.csv'")
+files.download('final_cleaned_dataset.csv')
+
+
+
+
+Objective of the Experiment
+To explore and compare popular data visualization tools – Tableau, Python libraries (like Matplotlib, Seaborn, Plotly), and D3.js, by visualizing sample datasets and understanding their strengths.
+
+Part 1: Visualization using Python Libraries
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Sample data
+data = {
+    'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+    'Sales': [250, 300, 400, 350, 500]
+}
+
+df = pd.DataFrame(data)
+
+# Line plot using matplotlib
+plt.plot(df['Month'], df['Sales'])
+plt.title("Monthly Sales")
+plt.xlabel("Month")
+plt.ylabel("Sales")
+plt.show()
+
+# Bar plot using seaborn
+sns.barplot(x='Month', y='Sales', data=df)
+plt.title("Monthly Sales - Bar Chart")
+plt.show()
+
+
+•  Use pandas for data manipulation
+•  matplotlib for basic charts
+•  seaborn for attractive and statistical plots
+
+
+
+Part 2: Visualization using Tableau
+✅ Step 1: Download & Install
+•	Visit: https://www.tableau.com/products/desktop/download
+•	Download Tableau Public (free version) or use trial for Tableau Desktop.
+✅ Step 2: Load Dataset
+1.	Open Tableau
+2.	Click on "Connect to Data"
+3.	Select "Text File" or Excel and load your dataset (e.g., CSV file)
+✅ Step 3: Create Visualization
+1.	Drag fields to Columns and Rows
+2.	Use the "Show Me" panel to select chart types (bar, pie, map, etc.)
+3.	Drag variables to Color, Size, Label to customize
+🔍 What You Learn:
+•	Drag-and-drop interface
+•	Real-time interactive dashboards
+•	Ideal for non-programmers
+________________________________________
+🟩 Part 3: Visualization using D3.js
+✅ Step 1: Set Up Environment
+•	D3.js is a JavaScript library
+•	Use a browser + text editor (like VS Code)
+✅ Step 2: Sample Code (Basic Bar Chart)
+Create a file bar_chart.html:
+html
+CopyEdit
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <script>
+    const data = [100, 200, 300, 250, 400];
+
+    d3.select("body")
+      .selectAll("div")
+      .data(data)
+      .enter()
+      .append("div")
+      .style("width", d => d + "px")
+      .style("background", "teal")
+      .style("margin", "5px")
+      .text(d => d);
+  </script>
+</body>
+</html>
+
+Open this file in your browser to see a horizontal bar chart.
+🔍 What You Learn:
+•	Use D3.js to bind data to DOM elements
+•	Control visuals using JavaScript
+•	Very customizable, but requires coding knowledge
+________________________________________
+📊 Summary Table
+Tool	Language	Best For	Learning Curve	Interactivity
+Python (matplotlib, seaborn)	Python	Coding, customization	Moderate	Medium
+Tableau	GUI	Dashboards, quick insights	Easy	High
+D3.js	JavaScript	Fully custom visualizations	High	Very High
+________________________________________
+•	
+
+
+
+
+Sample Dataset: Monthly Sales by Region
+
+Month	Region	Product	Sales	Profit
+Jan	North	Phone	12000	3000
+Jan	South	Laptop	15000	4000
+Jan	East	Tablet	10000	2500
+Feb	North	Phone	13000	3200
+Feb	South	Laptop	16000	4200
+Feb	East	Tablet	11000	2700
+Mar	North	Phone	14000	3500
+Mar	South	Laptop	17000	4500
+Mar	East	Tablet	12000	2900
+
+	
+
+1.	In Python (Pandas, Matplotlib, Seaborn):
+•	Group by Month and plot Sales vs Month (Line or Bar chart)
+2.	In Tableau:
+•	Load CSV and drag:
+o	Month to Columns
+o	Sales or Profit to Rows
+o	Region or Product to Color/Filter
+         Create:
+•	Line chart for Sales trend
+•	Pie chart for Profit by Region
+•	Stacked bar chart for Product-wise sales
+
+3. In D3.js:
+•	Use the JSON or array format of the data
+•	Make:
+o	Horizontal bar chart: Product vs Sales
+
+
+
+Sample Dataset: Student Performance
+Student	Gender	Subject	Marks	Grade
+Alice	F	Math	85	A
+Bob	M	Science	78	B
+Carol	F	English	92	A
+David	M	Math	65	C
+Eva	F	Science	88	B
+Frank	M	English	70	C
+Grace	F	Math	90	A
+Henry	M	Science	72	B
+Ivy	F	English	95	A
+
+
+
+
+
+1.	Python (Seaborn/Matplotlib/Plotly):
+•	Bar chart: Student vs Marks
+•	Boxplot: Subject-wise distribution of marks
+•	Countplot: Grade distribution
+•	Pie chart: Gender ratio
+
+2.	Tableau:
+•	Show average marks per subject
+•	Filter by gender
+•	Use color to show grade levels
+•	Create a heat map: Subject vs Student (Marks as color)
+3.	 D3.js:
+•	Horizontal bar chart of marks
+•	Color code by subject or grade
+•	Add mouseover tooltip showing subject and grade

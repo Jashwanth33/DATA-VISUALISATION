@@ -1,0 +1,73 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from pandas.plotting import parallel_coordinates
+
+# Load dataset
+df = pd.read_csv("WorldPopulation2023.csv")
+
+# Use only top 20 rows
+df = df.head(20).copy()
+
+# Clean 'UrbanPop%' column: remove %, replace 'N.A.' with 0 and convert to float
+df['UrbanPop%'] = df['UrbanPop%'].replace('N.A.', '0').str.rstrip('%').astype(float)
+
+# Clean 'YearlyChange' column: remove %, convert to float
+df['YearlyChange'] = df['YearlyChange'].str.rstrip(' %').astype(float)
+
+# Clean 'NetChange' column: remove commas if any, convert to int
+df['NetChange'] = df['NetChange'].astype(str).str.replace(',', '').astype(int)
+
+# Identify numeric and categorical columns
+num_cols = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
+cat_cols = df.select_dtypes(include=['object']).columns.tolist()
+
+# Create 'Urbanization_Level' categorical variable from 'UrbanPop%'
+if 'Urbanization_Level' not in df.columns:
+    df['Urbanization_Level'] = pd.cut(df['UrbanPop%'], bins=[-1, 40, 70, 100], labels=['Low', 'Medium', 'High'])
+    cat_cols.append('Urbanization_Level')
+
+# Create 'Density_Level' categorical variable from 'Density(P/Km²)'
+df['Density_Level'] = pd.cut(df['Density(P/Km²)'],
+                             bins=[-1, 50, 200, df['Density(P/Km²)'].max()],
+                             labels=['Low', 'Medium', 'High'])
+cat_cols.append('Density_Level')
+
+print("Numeric Columns:", num_cols)
+print("Categorical Columns:", cat_cols)
+
+# Scatterplot Matrix - pairwise numerical variables
+sns.pairplot(df[num_cols[:5]], diag_kind='kde')
+plt.suptitle("Scatterplot Matrix (Top 5 Numeric Columns, Top 20 Rows)", y=1.02)
+plt.show()
+
+# Parallel Coordinates Plot
+target_col = cat_cols[0]
+subset_cols = num_cols[:5] + [target_col]
+parallel_coordinates(df[subset_cols], class_column=target_col, colormap='viridis')
+plt.title("Parallel Coordinates Plot (Top 20 Rows)")
+plt.xticks(rotation=45)
+plt.show()
+
+# Line Graph - multiple numeric measures over record index
+df[num_cols[:4]].plot(kind='line', figsize=(10,5))
+plt.title("Line Graph of Multiple Measures (Top 20 Rows)")
+plt.xlabel("Record Index")
+plt.ylabel("Value")
+plt.show()
+
+# Stacked Bar Chart using 'Urbanization_Level' and 'Density_Level'
+stacked_col_1 = 'Urbanization_Level'
+stacked_col_2 = 'Density_Level'
+
+stacked_data = pd.crosstab(df[stacked_col_1], df[stacked_col_2])
+ax = stacked_data.plot(kind='bar', stacked=True, figsize=(8,5))
+plt.title(f"Stacked Bar Chart: {stacked_col_1} vs {stacked_col_2} (Top 20 Rows)")
+plt.ylabel("Count")
+plt.xticks(rotation=45)
+
+# Increase y-axis limit by 20% for better visual spacing
+max_height = stacked_data.sum(axis=1).max()
+plt.ylim(0, max_height * 1.2)
+
+plt.show()

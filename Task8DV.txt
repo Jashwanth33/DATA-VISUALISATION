@@ -1,0 +1,32 @@
+import geopandas as gpd
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Load Natural Earth shapefile (update path if needed)
+shapefile_path = 'ne_110m_admin_0_countries.shp'
+world = gpd.read_file(shapefile_path)
+
+# Load your population CSV
+df = pd.read_csv('WorldPopulation2023.csv', header=0)
+df.columns = df.columns.str.strip()
+
+# Merge population data into geopandas dataframe by matching country names
+world_pop = world.merge(df, left_on='ADMIN', right_on='Country', how='left')
+
+# Plot original projection colored by population
+fig, ax = plt.subplots(figsize=(12, 7))
+world_pop.plot(column='Population2023', ax=ax, legend=True, cmap='viridis', edgecolor='black')
+plt.title('World Map (Original Projection) Colored by Population')
+plt.show()
+
+# Convert to Mercator projection for reference
+world_merc = world_pop.to_crs(epsg=3857)
+
+# Plot Mercator projection colored by population in tall/narrow style
+fig, ax = plt.subplots(figsize=(4, 8))  # Tall, narrow plot for Mercator
+world_merc.plot(column='Population2023', ax=ax, legend=True, cmap='viridis', edgecolor='black')
+plt.title('World Countries by Population (Mercator Projection)')
+plt.axis('equal')
+ax.set_xlim(-2.5e7, 2.5e7)  # Centered X axis
+ax.set_ylim(-2.5e7, 1.2e8)  # Tall Y axis, similar to the screenshot
+plt.show()

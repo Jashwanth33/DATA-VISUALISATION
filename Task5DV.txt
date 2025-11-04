@@ -1,0 +1,24 @@
+
+
+import plotly.express as px
+import pandas as pd
+
+# Example: World Population dataset
+# (Replace this with your real dataset file if you have one like population.csv)
+data = {
+    'Continent': ['Asia', 'Asia', 'Asia', 'Europe', 'Europe', 'Africa', 'Africa', 'North America', 'South America'],
+    'Country': ['India', 'China', 'Japan', 'Germany', 'France', 'Nigeria', 'Egypt', 'USA', 'Brazil'],
+    'Population': [1410000000, 1440000000, 125000000, 83000000, 67000000, 206000000, 104000000, 331000000, 213000000]
+}
+
+df = pd.DataFrame(data)
+
+# TreeMap
+fig_tree_map = px.treemap(df, path=['Continent', 'Country'], values='Population',
+                           title='TreeMap Chart: World Population by Continent and Country')
+fig_tree_map.show()
+
+# Sunburst Chart
+fig_sunburst = px.sunburst(df, path=['Continent', 'Country'], values='Population',
+                            title='Sunburst Chart: World Population by Continent and Country')
+fig_sunburst.show()

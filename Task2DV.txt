@@ -1,0 +1,147 @@
+Task 2: To visualize and perform Univariate analysis using continuous and categorical data  CO2,S3
+Categorical Data - Bar chart, Pie Chart 
+Continuous data – Scatterplot, Line Plot, Strip Plot, Swarm Plot, Histogram, Density Plot, Rug Plot.                               
+Tools: Tableau, Language :Python 
+
+Procedure
+Dataset (CSV Format) - Student Performance Dataset
+
+gender,race/ethnicity,parental level of education,lunch,test preparation course,math score,reading score,writing score
+female,group B,bachelor's degree,standard,none,72,72,74
+female,group C,some college,standard,completed,69,90,88
+female,group B,master's degree,standard,none,90,95,93
+male,group A,associate's degree,free/reduced,none,47,57,44
+male,group C,some college,standard,none,76,78,75
+female,group B,associate's degree,standard,none,71,83,78
+male,group D,high school,free/reduced,completed,88,95,92
+female,group B,high school,free/reduced,none,40,43,39
+male,group E,some high school,standard,completed,64,64,67
+female,group D,associate's degree,standard,completed,78,77,79
+
+How to Use It
+1.	Open Notepad or a text editor.
+2.	Copy the data above into the file.
+3.	Save it as: StudentsPerformance.csv
+4.	Use the following Python code to load it:
+import pandas as pd
+
+df = pd.read_csv("C:\Users\SATHISH NARAYANAN\Downloads\StudentsPerformance.csv")
+print(df.head())
+
+
+1.	Categorical Data - Bar chart, Pie Chart 
+
+Univariate Analysis Using Python
+
+Categorical Columns in the Dataset
+From the Student Performance Dataset, common categorical variables include:
+•	gender
+•	race/ethnicity
+•	parental level of education
+•	lunch
+•	test preparation course
+•	
+Univariate Analysis of Categorical Data
+We analyze the frequency/count of each category (how often each category occurs), using:
+•	Bar Chart – Shows count of categories.
+•	Pie Chart – Shows proportion of categories.
+
+Step 1: Import Libraries
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+Step 2: Load Dataset
+df = pd.read_csv("StudentsPerformance.csv")  # Make sure the CSV file is in the same directory
+
+Step 3: Categorical Summary (Univariate)
+Let's analyze the column: gender
+print(df['gender'].value_counts())
+print(df['gender'].value_counts(normalize=True) * 100)  # Percentage
+
+Step 4: Bar Chart
+sns.countplot(x='gender', data=df)
+plt.title("Bar Chart - Gender Distribution")
+plt.xlabel("Gender")
+plt.ylabel("Count")
+plt.show()
+
+
+Step 5: Pie Chart
+# Prepare data
+gender_counts = df['gender'].value_counts()
+
+# Plot pie chart
+plt.pie(gender_counts, labels=gender_counts.index, autopct='%1.1f%%', startangle=90)
+plt.title("Pie Chart - Gender Distribution")
+plt.axis('equal')  # Equal aspect ratio ensures pie is a circle
+plt.show()
+
+
+
+2.	Continuous Data – Common Visualizations:
+1.	Histogram
+2.	Box Plot
+3.	Line Plot
+4.	Density Plot
+5.	Rug Plot
+6.	Strip Plot
+7.	Swarm Plot
+
+
+
+Univariate Analysis Using Python
+
+🔹 Step 1: Import Required Libraries
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+       Step 2: Load the Dataset
+df = pd.read_csv("StudentsPerformance.csv")  # Use the correct path
+
+    Step 3: Display First Few Rows
+print(df.head())
+
+Step 4: Select a Continuous Variable
+        We'll analyze math score, reading score, and writing score one by one.
+math_scores = df['math score']
+reading_scores = df['reading score']
+writing_scores = df['writing score']
+
+Step 5: Summary Statistics
+print("Math Score Summary:")
+print(math_scores.describe())
+
+print("\nReading Score Summary:")
+print(reading_scores.describe())
+
+print("\nWriting Score Summary:")
+print(writing_scores.describe())
+
+
+Step 6: Histogram (Distribution)
+
+sns.histplot(math_scores, bins=10, kde=False)
+plt.title("Histogram of Math Scores")
+plt.xlabel("Math Score")
+plt.ylabel("Frequency")
+plt.show()
+
+Step 7: Box Plot (Outliers and Spread)
+sns.boxplot(x=math_scores)
+plt.title("Box Plot of Math Scores")
+plt.xlabel("Math Score")
+plt.show()
+
+Step 8: Density Plot (Smooth Distribution)
+sns.kdeplot(math_scores, shade=True)
+plt.title("Density Plot of Math Scores")
+plt.xlabel("Math Score")
+plt.show()
+
+Step 9: Rug Plot (Exact Value Indicators)
+sns.rugplot(math_scores, height=0.1)
+plt.title("Rug Plot of Math Scores")
+plt.xlabel("Math Score")
+plt.show()
